@@ -2,11 +2,6 @@ from rest_framework import serializers
 
 from watchlist_app.models import WatchList, StreamPlatform
 
-class StreamPlatformSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StreamPlatform
-        fields = "__all__"
-
 class WatchListSerializer(serializers.ModelSerializer):
     title_len = serializers.SerializerMethodField()
 
@@ -23,3 +18,11 @@ class WatchListSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Name and description should be different')
 
         return data
+
+class StreamPlatformSerializer(serializers.ModelSerializer):
+    watchlist = WatchListSerializer(many=True, read_only=True)
+    # watchlist = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='movie-details')
+
+    class Meta:
+        model = StreamPlatform
+        fields = "__all__"
