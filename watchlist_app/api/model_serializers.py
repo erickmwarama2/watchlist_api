@@ -1,9 +1,17 @@
 from rest_framework import serializers
 
-from watchlist_app.models import WatchList, StreamPlatform
+from watchlist_app.models import WatchList, StreamPlatform, Review
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        # fields = "__all__"
+        exclude = ('watchlist',)
+
 
 class WatchListSerializer(serializers.ModelSerializer):
     title_len = serializers.SerializerMethodField()
+    reviews = ReviewSerializer(many=True, read_only=True)
 
     class Meta:
         model = WatchList
@@ -16,8 +24,8 @@ class WatchListSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data['title'] == data['description']:
             raise serializers.ValidationError('Name and description should be different')
-
         return data
+
 
 class StreamPlatformSerializer(serializers.ModelSerializer):
     watchlist = WatchListSerializer(many=True, read_only=True)
